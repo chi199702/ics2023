@@ -1,5 +1,5 @@
-STUID = 221220000
-STUNAME = 张三
+STUID = 3162052051717@glut.edu.cn
+STUNAME = ChiWeiming
 
 # DO NOT modify the following code!!!
 
