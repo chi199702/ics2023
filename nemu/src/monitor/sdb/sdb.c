@@ -53,6 +53,7 @@ static int cmd_q(char *args) {
 }
 
 static int cmd_help(char *args);
+static int cmd_si(char* args);
 
 static struct {
   const char *name;
@@ -64,7 +65,7 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
-
+	{ "si", "Execute one of the program's instructions", cmd_si },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -89,6 +90,11 @@ static int cmd_help(char *args) {
     }
     printf("Unknown command '%s'\n", arg);
   }
+  return 0;
+}
+
+static int cmd_si(char *args) {
+	cpu_exec_step();
   return 0;
 }
 
@@ -141,3 +147,4 @@ void init_sdb() {
   /* Initialize the watchpoint pool. */
   init_wp_pool();
 }
+
