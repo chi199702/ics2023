@@ -71,6 +71,15 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #endif
 }
 
+void cpu_exec_step() {
+	Decode s;
+	exec_once(&s, cpu.pc);
+	g_nr_guest_inst ++;
+	trace_and_difftest(&s, cpu.pc);
+	if (nemu_state.state != NEMU_RUNNING) return;
+	IFDEF(CONFIG_DEVICE, device_update());
+}
+
 static void execute(uint64_t n) {
   Decode s;
   for (;n > 0; n --) {
@@ -127,7 +136,3 @@ void cpu_exec(uint64_t n) {
   }
 }
 
-/* ------------------ cwm code ------------------------- */
-void cpu_exec_step() {
-	printf("execute command si\n");
-}
