@@ -73,6 +73,12 @@ static void exec_once(Decode *s, vaddr_t pc) {
 
 static void statistic(); 
 void cpu_exec_step() {
+  switch (nemu_state.state) {
+    case NEMU_END: case NEMU_ABORT:
+      printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");
+      return;
+    default: nemu_state.state = NEMU_RUNNING;
+  }
 	Decode s;
 	exec_once(&s, cpu.pc);
 	g_nr_guest_inst ++;
@@ -121,6 +127,12 @@ void assert_fail_msg() {
 
 /* Simulate how the CPU works. */
 void cpu_exec(uint64_t n) {
+  switch (nemu_state.state) {
+    case NEMU_END: case NEMU_ABORT:
+      printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");
+      return;
+    default: nemu_state.state = NEMU_RUNNING;
+  }
   g_print_step = (n < MAX_INST_TO_PRINT);
   switch (nemu_state.state) {
     case NEMU_END: case NEMU_ABORT:
