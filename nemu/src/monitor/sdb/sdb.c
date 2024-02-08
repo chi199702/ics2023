@@ -94,22 +94,26 @@ static int cmd_help(char *args) {
 }
 
 static int cmd_si(char *args) {
-	Log("%s\n", args);
-	char* remains = "";
-	long number = strtol(args, &remains, 10);
-	if (strlen(args) == strlen(remains)) {
-		Log("%s is not a valid integer, please input again\n", args);
-		return -1;
-	}else if (strlen(remains) == 1) {
-		Log("%ld instructions will be execute\n", number);
-		/*for (; number > 0; --number) {
-			cpu_exec_step(args);
-		}*/
+	if (!args) {
+		cpu_exec_step(args);
 	}else {
-		Log("%ld instructions will be execute, the %s is not valid, but program still can execute\n", number, remains);
-		/*for (; number > 0; --number) {
-			cpu_exec_step(args);
-		}*/
+		Log("%s\n", args);
+		char* remains = "";
+		long number = strtol(args, &remains, 10);
+		if (strlen(args) == strlen(remains)) {
+			Log("%s is not a valid integer, please input again\n", args);
+			return -1;
+		}else if (strlen(remains) == 1) {
+			Log("%ld instructions will be execute\n", number);
+			/*for (; number > 0; --number) {
+				cpu_exec_step(args);
+			}*/
+		}else {
+			Log("%ld instructions will be execute, the %s is not valid, but program still can execute\n", number, remains);
+			/*for (; number > 0; --number) {
+				cpu_exec_step(args);
+			}*/
+		}
 	}
   return 0;
 }
