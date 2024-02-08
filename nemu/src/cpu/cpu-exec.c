@@ -72,7 +72,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 }
 
 static void statistic(); 
-void cpu_exec_step() {
+void cpu_exec_step(char* args) {
   switch (nemu_state.state) {
     case NEMU_END: case NEMU_ABORT:
       printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");
