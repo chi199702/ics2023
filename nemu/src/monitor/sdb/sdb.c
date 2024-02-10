@@ -113,10 +113,10 @@ static int cmd_si(char *args) {
 			exit(EXIT_FAILURE);
 		}
 
-		Log("parse %s successful —> %ld", args, val);
 		if (*endptr != '\0') {
 			Log("Further characters after number: \"%s\"", endptr);
 		}
+		cpu_exec_step(val);
 	}
   return 0;
 }
