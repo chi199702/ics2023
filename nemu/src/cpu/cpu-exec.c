@@ -72,7 +72,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 }
 
 static void statistic(); 
-void cpu_exec_step(char* args) {
+void cpu_exec_step(unsigned long n_steps) {
   switch (nemu_state.state) {
     case NEMU_END: case NEMU_ABORT:
       printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");
@@ -80,12 +80,13 @@ void cpu_exec_step(char* args) {
     default: nemu_state.state = NEMU_RUNNING;
   }
 	Decode s;
-	exec_once(&s, cpu.pc);
-	g_nr_guest_inst ++;
-	trace_and_difftest(&s, cpu.pc);
-	if (nemu_state.state != NEMU_RUNNING) return;
-	IFDEF(CONFIG_DEVICE, device_update());
-
+	for (; n_steps > 0; --n_steps) {
+		exec_once(&s, cpu.pc);
+		g_nr_guest_inst ++;
+		trace_and_difftest(&s, cpu.pc);
+		if (nemu_state.state != NEMU_RUNNING) return;
+		IFDEF(CONFIG_DEVICE, device_update());
+	}
   switch (nemu_state.state) {
     case NEMU_RUNNING: nemu_state.state = NEMU_STOP; break;
 

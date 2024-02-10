@@ -95,24 +95,27 @@ static int cmd_help(char *args) {
 
 static int cmd_si(char *args) {
 	if (!args) {
-		cpu_exec_step(args);
+		cpu_exec_step(1);
 	}else {
-		Log("%s\n", args);
-		char* remains = "";
-		long number = strtol(args, &remains, 10);
-		if (strlen(args) == strlen(remains)) {
-			Log("%s is not a valid integer, please input again\n", args);
-			return -1;
-		}else if (strlen(remains) == 1) {
-			Log("%ld instructions will be execute\n", number);
-			/*for (; number > 0; --number) {
-				cpu_exec_step(args);
-			}*/
-		}else {
-			Log("%ld instructions will be execute, the %s is not valid, but program still can execute\n", number, remains);
-			/*for (; number > 0; --number) {
-				cpu_exec_step(args);
-			}*/
+		int base = 10;
+		char* endptr;
+		long val;
+
+		errno = 0;
+		val = strtol(args, &endptr, base);	
+		if (errno != 0) {
+			Log("error occur on strtol");
+			exit(EXIT_FAILURE);
+		}
+
+		if (endptr == args) {
+			Log("No digits were found\n");
+			exit(EXIT_FAILURE);
+		}
+
+		Log("parse %s successful —> %ld", args, val);
+		if (*endptr != '\0') {
+			Log("Further characters after number: \"%s\"", endptr);
 		}
 	}
   return 0;
