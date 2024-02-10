@@ -109,7 +109,7 @@ static int cmd_si(char *args) {
 		}
 
 		if (endptr == args) {
-			Log("No digits were found\n");
+			Log("No digits were found");
 			exit(EXIT_FAILURE);
 		}
 
