@@ -24,7 +24,10 @@ const char *regs[] = {
 };
 
 void isa_reg_display() {
-	printf("$0\t\t\t%x\t\t\t%d\n", cpu.gpr[0],cpu.gpr[0]);
+	unsigned int registers = sizeof(cpu.gpr) / sizeof(word_t);
+	for (int i = 0; i < registers; ++i) {
+		printf("%s\t\t\t%x\t\t\t%d\n", regs[i], cpu.gpr[0], cpu.gpr[0]);
+	}
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
