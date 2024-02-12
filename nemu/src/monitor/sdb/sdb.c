@@ -123,6 +123,9 @@ static int cmd_si(char *args) {
 }
 
 static int cmd_info(char* args) {
+	if (!args) {
+		Log("Usage: info r/w");
+	}
 	if (!strcmp(args, "r")) {
 		isa_reg_display();
 	}else if (!strcmp(args, "w")) {
