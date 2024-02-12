@@ -47,7 +47,6 @@ static int cmd_c(char *args) {
   return 0;
 }
 
-
 static int cmd_q(char *args) {
   return -1;
 }
@@ -124,7 +123,13 @@ static int cmd_si(char *args) {
 }
 
 static int cmd_info(char* args) {
-	isa_reg_display();
+	if (!strcmp(args, "r")) {
+		isa_reg_display();
+	}else if (!strcmp(args, "w")) {
+		Log("This function is not yet developed");
+	}else {
+		Log("Usage: info r/w");
+	}
 	return 0;
 }
 
