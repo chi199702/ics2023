@@ -54,6 +54,7 @@ static int cmd_q(char *args) {
 
 static int cmd_help(char *args);
 static int cmd_si(char* args);
+static int cmd_info(char* args);
 
 static struct {
   const char *name;
@@ -66,6 +67,7 @@ static struct {
 
   /* TODO: Add more commands */
 	{ "si", "Execute one of the program's instructions", cmd_si },
+	{ "info", "Display registers and watch points", cmd_info },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -119,6 +121,11 @@ static int cmd_si(char *args) {
 		cpu_exec_step(val);
 	}
   return 0;
+}
+
+static int cmd_info(char* args) {
+	isa_reg_display();
+	return 0;
 }
 
 void sdb_set_batch_mode() {
