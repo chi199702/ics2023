@@ -96,7 +96,7 @@ static int cmd_help(char *args) {
 
 static int cmd_si(char *args) {
 	if (!args) {	// no argument given
-		cpu_exec_step(1);
+		cpu_exec(1);
 	}else {
 		int base = 10;
 		char* endptr;
@@ -117,7 +117,7 @@ static int cmd_si(char *args) {
 		if (*endptr != '\0') {
 			Log("Further characters after number: \"%s\"", endptr);
 		}
-		cpu_exec_step(val);
+		cpu_exec(val);
 	}
   return 0;
 }
