@@ -54,6 +54,7 @@ static int cmd_q(char *args) {
 static int cmd_help(char *args);
 static int cmd_si(char* args);
 static int cmd_info(char* args);
+static int cmd_x(char* args);
 
 static struct {
   const char *name;
@@ -67,6 +68,7 @@ static struct {
   /* TODO: Add more commands */
 	{ "si", "Execute one of the program's instructions", cmd_si },
 	{ "info", "Display registers and watch points", cmd_info },
+	{ "x", "Print memory", cmd_x },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -133,6 +135,14 @@ static int cmd_info(char* args) {
 		Log("This function is not yet developed");
 	}else {
 		Log("Usage: info r/w");
+	}
+	return 0;
+}
+
+static int cmd_x(char* args) {
+	if (!args) {
+		Log("Usage: x N EXPR");
+		return 0;
 	}
 	return 0;
 }
