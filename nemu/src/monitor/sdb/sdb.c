@@ -54,7 +54,7 @@ static int cmd_q(char *args) {
 static int cmd_help(char *args);
 static int cmd_si(char* args);
 static int cmd_info(char* args);
-static int cmd_x(char* args);
+//static int cmd_x(char* args);
 
 static struct {
   const char *name;
@@ -68,7 +68,7 @@ static struct {
   /* TODO: Add more commands */
 	{ "si", "Execute one of the program's instructions", cmd_si },
 	{ "info", "Display registers and watch points", cmd_info },
-	{ "x", "Print memory", cmd_x },
+	//{ "x", "Print memory", cmd_x },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -138,15 +138,42 @@ static int cmd_info(char* args) {
 	}
 	return 0;
 }
-
+/*
 static int cmd_x(char* args) {
-	if (!args) {
+  char* arg_N = strtok(NULL, " ");
+	char* arg_EXPR = strtok(NULL, " ");
+	if (!args || !arg_EXPR) {
 		Log("Usage: x N EXPR");
 		return 0;
 	}
+
+	int base_N = 10, base_EXPR = 16;
+	char* endptr_N, *endptr_EXPR;
+	long N, EXPR;
+
+	errno = 0;
+	N = strtol(arg_N, &endptr_N, base_N);	
+	EXPR = strtol(arg_EXPR, &endptr_EXPR, base_EXPR);
+	if (errno != 0) {
+		Log("error occur on strtol");
+		exit(EXIT_FAILURE);
+	}
+
+	if (endptr_N == arg_N || endptr_EXPR == arg_EXPR) {
+		Log("No digits were found");
+		exit(EXIT_FAILURE);
+	}
+
+	if (*endptr_N != '\0') {
+		Log("Further characters after number: \"%s\"", endptr_N);
+	}
+	if (*endptr_EXPR != '\0') {
+		Log("Further characters after number: \"%s\"", endptr_EXPR);
+	}
+	// TODO: print memory
 	return 0;
 }
-
+*/
 void sdb_set_batch_mode() {
   is_batch_mode = true;
 }
