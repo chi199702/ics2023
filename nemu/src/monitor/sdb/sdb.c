@@ -54,7 +54,7 @@ static int cmd_q(char *args) {
 static int cmd_help(char *args);
 static int cmd_si(char* args);
 static int cmd_info(char* args);
-//static int cmd_x(char* args);
+static int cmd_x(char* args);
 
 static struct {
   const char *name;
@@ -68,7 +68,7 @@ static struct {
   /* TODO: Add more commands */
 	{ "si", "Execute one of the program's instructions", cmd_si },
 	{ "info", "Display registers and watch points", cmd_info },
-	//{ "x", "Print memory", cmd_x },
+	{ "x", "Print memory", cmd_x },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -138,7 +138,8 @@ static int cmd_info(char* args) {
 	}
 	return 0;
 }
-/*
+
+void cpu_memory_print(unsigned long n, paddr_t addr);
 static int cmd_x(char* args) {
   char* arg_N = strtok(NULL, " ");
 	char* arg_EXPR = strtok(NULL, " ");
@@ -170,10 +171,10 @@ static int cmd_x(char* args) {
 	if (*endptr_EXPR != '\0') {
 		Log("Further characters after number: \"%s\"", endptr_EXPR);
 	}
-	// TODO: print memory
+	cpu_memory_print((unsigned long)N, (paddr_t)EXPR);
 	return 0;
 }
-*/
+
 void sdb_set_batch_mode() {
   is_batch_mode = true;
 }

@@ -64,5 +64,13 @@ void paddr_write(paddr_t addr, int len, word_t data) {
 }
 
 void memory_print(unsigned long n, paddr_t addr) {
-
+	int byte_count = 4;
+	int count = 1;
+	for(; n > 0; --n) { 
+		printf(""FMT_PADDR"\t\t"FMT_WORD"\t\t", addr, paddr_read(addr, byte_count));	
+		if (n && count % 4 == 0) {
+			printf("\n");
+		}
+		++count;
+	}
 }

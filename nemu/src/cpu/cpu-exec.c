@@ -135,3 +135,8 @@ void cpu_exec(uint64_t n) {
   }
 }
 
+void memory_print(unsigned long n, paddr_t addr);
+
+void cpu_memory_print(unsigned long n, paddr_t addr) {
+	memory_print(n, addr);
+}
