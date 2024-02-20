@@ -68,13 +68,14 @@ void memory_print(unsigned long n, paddr_t addr) {
 	int count = 0;
 	for(; n > 0; --n) { 
 		if (count % 4 == 0) {
-			printf(""FMT_PADDR"\t\t", addr);
+			printf(""FMT_PADDR":\t", addr);
 		}
-		printf(""FMT_WORD"\t\t", paddr_read(addr, byte_count));	
+		printf(""FMT_WORD"\t", paddr_read(addr, byte_count));	
 		addr += 4;
 		++count;
 		if (count % 4 == 0) {
 			printf("\n");
 		}
 	}
+	printf("\n");
 }
