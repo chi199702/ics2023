@@ -68,7 +68,7 @@ void memory_print(unsigned long n, paddr_t addr) {
 	int count = 0;
 	for(; n > 0; --n) { 
 		if (count % 4 == 0) {
-			printf(""FMT_PADDR":\t", addr);
+			printf(ANSI_FMT(FMT_PADDR, ANSI_BG_BLUE) "\t", addr);
 		}
 		printf(""FMT_WORD"\t", paddr_read(addr, byte_count));	
 		addr += 4;
