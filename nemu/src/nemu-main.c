@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 		if (expression >= buf_end) {
 			continue;			
 		}
-		printf("%s\n", buf);	
+		printf("%s\n", expression);	
 		printf("%s\n", result);
 	}
 	
