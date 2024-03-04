@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 	static char buf[65536] = {};
 	FILE* f = fopen(dir, "r");
 	while (fgets(buf, 65535, f)) {
-		printf("%s\n", buf);
+		printf("%s", buf);
 	}
 	
   /* Initialize the monitor. */
