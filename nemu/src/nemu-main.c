@@ -19,7 +19,25 @@ void init_monitor(int, char *[]);
 void am_init_monitor();
 void engine_start();
 int is_exit_status_bad();
+
 /*
+int main(int argc, char* argv[]) { */
+  /* Initialize the monitor. */
+/*
+#ifdef CONFIG_TARGET_AM
+  am_init_monitor();
+#else
+  init_monitor(argc, argv);
+#endif
+*/
+  /* Start engine. */
+/*	
+  engine_start();
+
+  return is_exit_status_bad();
+}
+*/
+
 int main(int argc, char *argv[]) {
 	static char* dir = "/home/chiweiming/code/ics2023/nemu/tools/gen-expr/build/input";
 	static char buf[65536] = {};
@@ -28,25 +46,14 @@ int main(int argc, char *argv[]) {
 		char* buf_end = buf + strlen(buf);
 		char* result = strtok(buf, " ");
 		if (buf_end == NULL) { continue; }
-		char* expression = 
+
+		char* expression = result + strlen(result) + 1;
+
+		if (expression >= buf_end) {
+			continue;			
+		}
+		
 	}
 	
 	return 0;
-}
-*/
-
-int main(int argc, char* argv[]) { 
-  /* Initialize the monitor. */
-
-#ifdef CONFIG_TARGET_AM
-  am_init_monitor();
-#else
-  init_monitor(argc, argv);
-#endif
-
-  /* Start engine. */
-	
-  engine_start();
-
-  return is_exit_status_bad();
 }
