@@ -21,15 +21,26 @@ void engine_start();
 int is_exit_status_bad();
 
 int main(int argc, char *argv[]) {
+	static char* dir = "/home/chiweiming/code/ics2023/nemu/tools/gen-expr/build/input";
+	static char buf[65536] = {};
+	FILE* f = fopen(dir, "r");
+	while (fgets(buf, 65535, f)) {
+		printf("%s\n", buf);
+	}
+	
   /* Initialize the monitor. */
+/*
 #ifdef CONFIG_TARGET_AM
   am_init_monitor();
 #else
   init_monitor(argc, argv);
 #endif
-
+*/
   /* Start engine. */
+	/*
   engine_start();
 
   return is_exit_status_bad();
+	*/
+	return 0;
 }

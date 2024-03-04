@@ -31,8 +31,60 @@ static char *code_format =
 "  return 0; "
 "}";
 
+static int deep;
+uint32_t choose(uint32_t n) {
+	if (deep <= 0) {	// limit the depth of recursion, does not allow the buf to overflow
+		return 0;
+	}
+	--deep;
+	return (uint32_t)random() % n;
+}
+
+char gen_rand_op() {
+	long op = random() % 4;
+	switch(op) {
+		case 0: return '+';
+		case 1: return '-';
+		case 2: return '*';
+		case 3: return '/';
+		default: return '+';
+	}
+	return '+';
+}
+
+void insert_space() {
+	if (random() % 2) {
+		strcat(buf, " ");
+	}
+}
+
 static void gen_rand_expr() {
-  buf[0] = '\0';
+  // buf[0] = '\0';
+	
+	char strnum[128] = {};
+	char c[2] = {};
+	switch(choose(3)) {
+		case 0: 
+			sprintf(strnum, "%u", (uint32_t)random()); 
+			strcat(buf, strnum);
+			strcat(buf, "u");	// ensure that expressions perform unsigned operations
+			insert_space();
+			break;
+		case 1:
+			strcat(buf, "(");
+			insert_space();
+			gen_rand_expr();
+			insert_space();
+			strcat(buf, ")");
+			break;
+		default:
+			gen_rand_expr();
+			*c = gen_rand_op();
+			insert_space();
+			strcat(buf, c);	
+			insert_space();
+			gen_rand_expr();
+	}
 }
 
 int main(int argc, char *argv[]) {
@@ -44,6 +96,8 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
+		deep = 30;
+		buf[0] = '\0';
     gen_rand_expr();
 
     sprintf(code_buf, code_format, buf);
@@ -53,7 +107,7 @@ int main(int argc, char *argv[]) {
     fputs(code_buf, fp);
     fclose(fp);
 
-    int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
+    int ret = system("gcc /tmp/.code.c -Wall -Werror -o /tmp/.expr");
     if (ret != 0) continue;
 
     fp = popen("/tmp/.expr", "r");
