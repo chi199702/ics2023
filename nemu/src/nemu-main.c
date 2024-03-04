@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 	while (fgets(buf, 65535, f)) {
 		char* buf_end = buf + strlen(buf);
 		char* result = strtok(buf, " ");
-		if (buf_end == NULL) { continue; }
+		if (result == NULL) { continue; }
 
 		char* expression = result + strlen(result) + 1;
 
