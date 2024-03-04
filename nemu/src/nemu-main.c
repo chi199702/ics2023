@@ -48,14 +48,15 @@ int main(int argc, char *argv[]) {
 		}
 		char* buf_end = buf + strlen(buf);
 		char* result = strtok(buf, " ");
-		if (result != NULL) { continue; }
+	//	if (result != NULL) { continue; }
 
 		char* expression = result + strlen(result) + 1;
 
 		if (expression >= buf_end) {
 			continue;			
 		}
-		
+		printf("%s\n", buf);	
+		printf("%s\n", result);
 	}
 	
 	return 0;
