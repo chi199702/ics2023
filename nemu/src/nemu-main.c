@@ -40,9 +40,12 @@ int main(int argc, char* argv[]) { */
 
 int main(int argc, char *argv[]) {
 	static char* dir = "/home/chiweiming/code/ics2023/nemu/tools/gen-expr/build/input";
-	static char buf[65536] = {};
 	FILE* f = fopen(dir, "r");
-	while (fgets(buf, 65535, f)) {
+	while (1) {
+		char buf[65536] = {};
+		if (!fgets(buf, 65535, f)) {
+			break;	
+		}
 		char* buf_end = buf + strlen(buf);
 		char* result = strtok(buf, " ");
 		if (result == NULL) { continue; }
