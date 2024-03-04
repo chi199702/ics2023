@@ -36,8 +36,8 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
-	{"(", '('},						// - left bracket
-	{")", ')'},						// - right bracket
+	{"\\(", '('},						// - left bracket
+	{"\\)", ')'},						// - right bracket
 	{"\\*", '*'},					// - mul
 	{"/", '/'},						// - div
   {" +", TK_NOTYPE},    // spaces
