@@ -44,7 +44,7 @@ static struct rule {
   {"-", '-'},						// - sub
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
-	{"\\d+u", TK_DECIMAL},	// - decimal number
+	{"-?[0-9]+u$", TK_DECIMAL},	// - decimal number
 };
 
 #define NR_REGEX ARRLEN(rules)
