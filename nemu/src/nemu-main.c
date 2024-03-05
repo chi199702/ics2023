@@ -62,6 +62,11 @@ int main(int argc, char *argv[]) {
 		if (expression >= buf_end) {
 			continue;			
 		}
+		
+		word_t expr(char*, bool*);
+		bool flag;
+		uint32_t cal_res = expr(expression, &flag); 
+		printf("%u\n", cal_res);
 	}
 	
 	return 0;
