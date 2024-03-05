@@ -41,6 +41,14 @@ int main(int argc, char* argv[]) { */
 int main(int argc, char *argv[]) {
 	static char* dir = "/home/chiweiming/code/ics2023/nemu/tools/gen-expr/build/input";
 	FILE* f = fopen(dir, "r");
+
+  /* Initialize the monitor. */
+#ifdef CONFIG_TARGET_AM
+  am_init_monitor();
+#else
+  init_monitor(argc, argv);
+#endif
+
 	while (1) {
 		char buf[65536] = {};
 		if (!fgets(buf, 65535, f)) {
@@ -51,12 +59,9 @@ int main(int argc, char *argv[]) {
 		if (result == NULL) { continue; }
 
 		char* expression = result + strlen(result) + 1;
-
 		if (expression >= buf_end) {
 			continue;			
 		}
-		printf("%s\n", expression);	
-		printf("%s\n", result);
 	}
 	
 	return 0;
