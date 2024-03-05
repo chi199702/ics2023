@@ -44,7 +44,7 @@ static struct rule {
   {"-", '-'},						// - sub
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
-	{"\\d+", TK_DECIMAL},	// - decimal number
+	{"\\d+u", TK_DECIMAL},	// - decimal number
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -65,6 +65,7 @@ void init_regex() {
       regerror(ret, &re[i], error_msg, 128);
       panic("regex compilation failed: %s\n%s", error_msg, rules[i].regex);
     }
+		printf("%s\n", rules[i].regex);
   }
 }
 
