@@ -1,17 +1,17 @@
 /***************************************************************************************
-* Copyright (c) 2014-2022 Zihao Yu, Nanjing University
-*
-* NEMU is licensed under Mulan PSL v2.
-* You can use this software according to the terms and conditions of the Mulan PSL v2.
-* You may obtain a copy of Mulan PSL v2 at:
-*          http://license.coscl.org.cn/MulanPSL2
-*
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-* EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-* MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-*
-* See the Mulan PSL v2 for more details.
-***************************************************************************************/
+ * Copyright (c) 2014-2022 Zihao Yu, Nanjing University
+ *
+ * NEMU is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ *
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ *
+ * See the Mulan PSL v2 for more details.
+ ***************************************************************************************/
 
 #include <isa.h>
 #include <cpu/cpu.h>
@@ -66,9 +66,9 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
-	{ "si", "Execute one of the program's instructions", cmd_si },
-	{ "info", "Display registers and watch points", cmd_info },
-	{ "x", "Print memory", cmd_x },
+  { "si", "Execute one of the program's instructions", cmd_si },
+  { "info", "Display registers and watch points", cmd_info },
+  { "x", "Print memory", cmd_x },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -97,82 +97,82 @@ static int cmd_help(char *args) {
 }
 
 static int cmd_si(char *args) {
-	if (!args) {	// no argument given
-		cpu_exec(1);
-	}else {
-		int base = 10;
-		char* endptr;
-		long val;
+  if (!args) {	// no argument given
+    cpu_exec(1);
+  }else {
+    int base = 10;
+    char* endptr;
+    long val;
 
-		errno = 0;
-		val = strtol(args, &endptr, base);	
-		if (errno != 0) {
-			Log("error occur on strtol");
-			exit(EXIT_FAILURE);
-		}
+    errno = 0;
+    val = strtol(args, &endptr, base);	
+    if (errno != 0) {
+      Log("error occur on strtol");
+      exit(EXIT_FAILURE);
+    }
 
-		if (endptr == args) {
-			Log("No digits were found");
-			exit(EXIT_FAILURE);
-		}
+    if (endptr == args) {
+      Log("No digits were found");
+      exit(EXIT_FAILURE);
+    }
 
-		if (*endptr != '\0') {
-			Log("Further characters after number: \"%s\"", endptr);
-		}
-		cpu_exec(val);
-	}
+    if (*endptr != '\0') {
+      Log("Further characters after number: \"%s\"", endptr);
+    }
+    cpu_exec(val);
+  }
   return 0;
 }
 
 static int cmd_info(char* args) {
-	if (!args) {
-		Log("Usage: info r/w");
-		return 0;
-	}
-	if (!strcmp(args, "r")) {
-		isa_reg_display();
-	}else if (!strcmp(args, "w")) {
-		Log("This function is not yet developed");
-	}else {
-		Log("Usage: info r/w");
-	}
-	return 0;
+  if (!args) {
+    Log("Usage: info r/w");
+    return 0;
+  }
+  if (!strcmp(args, "r")) {
+    isa_reg_display();
+  }else if (!strcmp(args, "w")) {
+    Log("This function is not yet developed");
+  }else {
+    Log("Usage: info r/w");
+  }
+  return 0;
 }
 
 void cpu_memory_print(unsigned long n, paddr_t addr);
 static int cmd_x(char* args) {
   char* arg_N = strtok(NULL, " ");
-	char* arg_EXPR = strtok(NULL, " ");
-	if (!args || !arg_EXPR) {
-		Log("Usage: x N EXPR");
-		return 0;
-	}
+  char* arg_EXPR = strtok(NULL, " ");
+  if (!args || !arg_EXPR) {
+    Log("Usage: x N EXPR");
+    return 0;
+  }
 
-	int base_N = 10, base_EXPR = 16;
-	char* endptr_N, *endptr_EXPR;
-	long N, EXPR;
+  int base_N = 10, base_EXPR = 16;
+  char* endptr_N, *endptr_EXPR;
+  long N, EXPR;
 
-	errno = 0;
-	N = strtol(arg_N, &endptr_N, base_N);	
-	EXPR = strtol(arg_EXPR, &endptr_EXPR, base_EXPR);
-	if (errno != 0) {
-		Log("error occur on strtol");
-		exit(EXIT_FAILURE);
-	}
+  errno = 0;
+  N = strtol(arg_N, &endptr_N, base_N);	
+  EXPR = strtol(arg_EXPR, &endptr_EXPR, base_EXPR);
+  if (errno != 0) {
+    Log("error occur on strtol");
+    exit(EXIT_FAILURE);
+  }
 
-	if (endptr_N == arg_N || endptr_EXPR == arg_EXPR) {
-		Log("No digits were found");
-		exit(EXIT_FAILURE);
-	}
+  if (endptr_N == arg_N || endptr_EXPR == arg_EXPR) {
+    Log("No digits were found");
+    exit(EXIT_FAILURE);
+  }
 
-	if (*endptr_N != '\0') {
-		Log("Further characters after number: \"%s\"", endptr_N);
-	}
-	if (*endptr_EXPR != '\0') {
-		Log("Further characters after number: \"%s\"", endptr_EXPR);
-	}
-	cpu_memory_print((unsigned long)N, (paddr_t)EXPR);
-	return 0;
+  if (*endptr_N != '\0') {
+    Log("Further characters after number: \"%s\"", endptr_N);
+  }
+  if (*endptr_EXPR != '\0') {
+    Log("Further characters after number: \"%s\"", endptr_EXPR);
+  }
+  cpu_memory_print((unsigned long)N, (paddr_t)EXPR);
+  return 0;
 }
 
 void sdb_set_batch_mode() {
