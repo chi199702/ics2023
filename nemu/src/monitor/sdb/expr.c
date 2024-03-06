@@ -24,7 +24,7 @@ enum {
   TK_NOTYPE = 256, TK_EQ,
 
   /* TODO: Add more token types */
-	TK_DECIMAL,
+	TK_DECIMAL, TK_NEWLINE,
 };
 
 static struct rule {
@@ -45,6 +45,7 @@ static struct rule {
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
 	{"[0-9]+u", TK_DECIMAL},	// - decimal numberi,can't use $
+  {"\\n", TK_NEWLINE},   // - '\n'
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -132,6 +133,8 @@ static bool make_token(char *e) {
 						strncpy(tokens[nr_token].str, substr_start, substr_len);
 						tokens[nr_token++].str[substr_len] = '\0';
 						break;
+          case TK_NEWLINE:  // throw out
+            break;
           default:
 						Log("regular expression \"==\" wait for development"); 
         }
