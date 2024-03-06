@@ -119,6 +119,7 @@ static bool make_token(char *e) {
             tokens[nr_token++].str[0] = '/';
             break;
           case TK_NOTYPE:	// throw out
+          case TK_NEWLINE:
             break;
           case '-':
             tokens[nr_token].type = '-';
@@ -131,8 +132,6 @@ static bool make_token(char *e) {
           case TK_DECIMAL:
             strncpy(tokens[nr_token].str, substr_start, substr_len);
             tokens[nr_token++].str[substr_len] = '\0';
-            break;
-          case TK_NEWLINE:  // throw out
             break;
           default:
             Log("regular expression \"==\" wait for development"); 
@@ -151,18 +150,12 @@ static bool make_token(char *e) {
   return true;
 }
 
-#define WAIT_PARSE 0
-#define BAD_EXPRESSION -1
-
-static int check_parentheses(uint32_t p, uint32_t q) {
-  if (tokens[p].str[0] != '(' || tokens[q].str[0] != ')') {
-    return WAIT_PARSE;
-  }
-
-  /* find all the parentheses in [p + 1, q - 1] of array tokens */
+/* check if all the parentheses of the expression match */
+static bool bracket_match(uint32_t p, uint32_t q) {
+  /* collect all the parentheses in [p + 1, q - 1] of array tokens */
   char brackets[128];
   uint32_t len = 0;
-  for (int i = p + 1; i < q; ++i) {
+  for (int i = p; i <= q; ++i) {
     if (tokens[i].str[0] == '(') {
       brackets[len++] = '(';	
     }else if (tokens[i].str[0] == ')') {
@@ -171,37 +164,82 @@ static int check_parentheses(uint32_t p, uint32_t q) {
   }
 
   if (!len) {
-    return WAIT_PARSE;
+    return true;
+  }
+  if (len % 2) {
+    return false;
   }
 
-  /* judge parentheses match */
-  if (len % 2) {
-    return BAD_EXPRESSION;
-  }
-  int stk[len + 1];
+  int stk[len];
   int top = 0;
   for (int i = 0; i < len; ++i) {
     if (brackets[i] == '(') {
       stk[top++] = '(';
     }else {
       if (top == 0 || stk[top - 1] != '(') {
-        return BAD_EXPRESSION;
+        return false;
       }
       --top;
     }
   }
-  return top == 0 ? WAIT_PARSE : BAD_EXPRESSION;
+  return top == 0 ? true : false;
 }
 
+/* check that the expression is not wrapped in the outermost pair of parentheses  */
+static bool check_parentheses(uint32_t p, uint32_t q) {
+  if (tokens[p].str[0] != '(' || tokens[q].str[0] != ')') {
+    return false;
+  }
+  return bracket_match(p + 1, q - 1);
+}
+
+#define LOW_PRIORITY  0
+#define HIGH_PRIORITY 1
 static int get_priority(int operator) {
   if (operator == '+' || operator == '-') {
-    return 0;
+    return LOW_PRIORITY;
   }
-  return 1;
+  return HIGH_PRIORITY;
 }
 
+#define BAD_EXPRESSION -1
+/* find the main operator  */
+int get_main_operator(uint32_t p, uint32_t q, int* idx_main_operator, char* main_operator) {
+  int left_bracket = 0, right_bracket = 0;
+  for (int i = p; i <= q; ++i) {
+    int type = tokens[i].type;
+    if (type == TK_NOTYPE || type == TK_DECIMAL || type == TK_EQ || type == TK_NEWLINE) {
+      continue;
+    }
+    if (type == '(') {
+      ++left_bracket;
+    }else if (type == ')') {
+      ++right_bracket;
+    }
+    if (left_bracket < right_bracket) {
+      return BAD_EXPRESSION;	// bad expression
+    }
+    /* '+' '-' '*' '/' */
+    if (left_bracket > right_bracket) {	// the operator is in parentheses
+      continue;
+    }
+    if (*idx_main_operator == -1) {
+      *idx_main_operator = i;
+      *main_operator = tokens[i].str[0];
+    }else {
+      int pre_priority = get_priority(*main_operator);
+      int now_priority = get_priority(tokens[i].str[0]);
+      if (pre_priority >= now_priority) {
+        *idx_main_operator = i;
+        *main_operator = tokens[i].str[0];
+      }
+    }	
+  }
+  return 0;
+}
+
+#define INIT -1
 static long eval(uint32_t p, uint32_t q) {
-  long match_bracket_res;
   if (p > q) {
     Log("bad expression, p > q");
     return BAD_EXPRESSION;
@@ -223,57 +261,23 @@ static long eval(uint32_t p, uint32_t q) {
     }
 
     return val;
-  }else if ((match_bracket_res = check_parentheses(p, q)) == WAIT_PARSE) {
+  }else if (check_parentheses(p, q)) {
     return eval(p + 1, q - 1);
-  }else {
-    if (match_bracket_res == BAD_EXPRESSION) {
-      return BAD_EXPRESSION;
-    }
-    int idx_last_operator	= -1;
-    char last_operator;
-    int left_bracket = 0, right_bracket = 0;
-    for (int i = p; i <= q; ++i) {
-      int type = tokens[i].type;
-      if (type == TK_NOTYPE || type == TK_DECIMAL) {
-        continue;
-      }
-      if (type == '(') {
-        ++left_bracket;
-      }
-      if (type == ')') {
-        ++right_bracket;
-      }
-      if (left_bracket < right_bracket) {
-        return BAD_EXPRESSION;	// bad expression
-      }
-      /* '+' '-' '*' '/' */
-      if (left_bracket > right_bracket) {	// the operator is in parentheses
-        continue;
-      }
-      if (idx_last_operator == -1) {
-        idx_last_operator = i;
-        last_operator = tokens[i].str[0];
-      }else {
-        int pre_priority = get_priority(last_operator);
-        int last_priority = get_priority(tokens[i].str[0]);
-        if (pre_priority > last_priority) {
-          idx_last_operator = i;
-          last_operator = tokens[i].str[0];
-        }
-      }	
-    }
-    if (idx_last_operator == -1) {
+  }else { // bad or good expression, further judgement required
+    int idx_main_operator = INIT;
+    char main_operator;
+    get_main_operator(p, q, &idx_main_operator, &main_operator);
+    if (get_main_operator(p, q, &idx_main_operator, &main_operator) == BAD_EXPRESSION || idx_main_operator == INIT) {
       return BAD_EXPRESSION;	// bad expression
     }
 
-    long left_result = eval(p, idx_last_operator - 1);
-    long right_result = eval(idx_last_operator + 1, q);
-
+    long left_result = eval(p, idx_main_operator - 1);
+    long right_result = eval(idx_main_operator + 1, q);
     if (left_result == BAD_EXPRESSION || right_result == BAD_EXPRESSION) {
       return BAD_EXPRESSION;
     }
 
-    switch(last_operator) {
+    switch(main_operator) {
       case '+': return left_result + right_result;	
       case '-': return left_result - right_result;	
       case '*': return left_result * right_result;	
