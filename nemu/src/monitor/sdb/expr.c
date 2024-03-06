@@ -118,9 +118,7 @@ static bool make_token(char *e) {
 						tokens[nr_token].type = '/';
 						tokens[nr_token++].str[0] = '/';
 						break;
-					case TK_NOTYPE:
-						tokens[nr_token].type = TK_NOTYPE;
-						tokens[nr_token++].str[0] = ' ';
+					case TK_NOTYPE:	// throw out
 						break;
 					case '-':
 						tokens[nr_token].type = '-';
