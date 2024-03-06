@@ -45,7 +45,7 @@ static struct rule {
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
   {"[0-9]+u", TK_DECIMAL},	// - decimal numberi,can't use $
-  {"\\n", TK_NEWLINE},   // - '\n'
+  {"\\\n", TK_NEWLINE},   // - '\n'
 };
 
 #define NR_REGEX ARRLEN(rules)
