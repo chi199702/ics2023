@@ -69,7 +69,8 @@ int main(int argc, char *argv[]) {
     char str[128];
     sprintf(str, "%u", cal_res); 
     if (strcmp(str, result)) {
-      printf("eval fail\ncorrect:\t%s, eval:\t%s", result, str);
+      printf("expression:%s\n", expression);
+      printf("eval fail\ncorrect:\t%s, eval:\t%s\n", result, str);
     }
   }
 
