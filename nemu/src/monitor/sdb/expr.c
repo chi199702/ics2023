@@ -267,7 +267,6 @@ static long eval(uint32_t p, uint32_t q) {
   }else { // bad or good expression, further judgement required
     int idx_main_operator = INIT;
     char main_operator;
-    get_main_operator(p, q, &idx_main_operator, &main_operator);
     if (get_main_operator(p, q, &idx_main_operator, &main_operator) == BAD_EXPRESSION || idx_main_operator == INIT) {
       return BAD_EXPRESSION;	// bad expression
     }
