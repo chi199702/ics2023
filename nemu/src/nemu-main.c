@@ -66,7 +66,11 @@ int main(int argc, char *argv[]) {
     word_t expr(char*, bool*);
     bool flag;
     uint32_t cal_res = expr(expression, &flag); 
-    printf("%u\n", cal_res);
+    char str[128];
+    sprintf(str, "%u", cal_res); 
+    if (strcmp(str, result)) {
+      printf("eval fail\ncorrect:\t%s, eval:\t%s", result, str);
+    }
   }
 
   return 0;
