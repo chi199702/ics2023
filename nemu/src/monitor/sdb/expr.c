@@ -256,10 +256,11 @@ static long eval(uint32_t p, uint32_t q) {
     }
 
     if (endptr == tokens[p].str || *endptr != '\0') {
-      Log("No digits were found or the string is a alphanumeric : \" %s \"", tokens[p].str);
-      return BAD_EXPRESSION;
+      if (strcmp(endptr, "u")) {
+        Log("No digits were found or the string is a alphanumeric : \" %s \"", tokens[p].str);
+        return BAD_EXPRESSION;
+      }
     }
-
     return val;
   }else if (check_parentheses(p, q)) {
     return eval(p + 1, q - 1);
