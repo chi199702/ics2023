@@ -213,8 +213,10 @@ int get_main_operator(uint32_t p, uint32_t q, int* idx_main_operator, char* main
     }
     if (type == '(') {
       ++left_bracket;
+      continue;
     }else if (type == ')') {
       ++right_bracket;
+      continue;
     }
     if (left_bracket < right_bracket) {
       return BAD_EXPRESSION;	// bad expression
