@@ -272,8 +272,8 @@ static long eval(uint32_t p, uint32_t q) {
       return BAD_EXPRESSION;	// bad expression
     }
 
-    long left_result = eval(p, idx_main_operator - 1);
-    long right_result = eval(idx_main_operator + 1, q);
+    uint32_t left_result = (uint32_t)eval(p, idx_main_operator - 1);
+    uint32_t right_result = (uint32_t)eval(idx_main_operator + 1, q);
     if (left_result == BAD_EXPRESSION || right_result == BAD_EXPRESSION) {
       return BAD_EXPRESSION;
     }
