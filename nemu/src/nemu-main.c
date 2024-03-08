@@ -75,6 +75,9 @@ int main(int argc, char *argv[]) {
       break;
     }
     ++count;
+    if (count > 1000) {
+      break;
+    }
   }
 
   return 0;
