@@ -75,7 +75,8 @@ int main(int argc, char *argv[]) {
       break;
     }
     ++count;
-    if (count > 1000) {
+    if (count == 269) {
+      printf("\n\n\n");
       break;
     }
   }
