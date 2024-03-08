@@ -49,6 +49,7 @@ int main(int argc, char *argv[]) {
   init_monitor(argc, argv);
 #endif
 
+  int count = 0;
   while (1) {
     char buf[65536] = {};
     if (!fgets(buf, 65535, f)) {
@@ -73,6 +74,7 @@ int main(int argc, char *argv[]) {
       printf("eval fail\ncorrect:\t%s, eval:\t%s\n", result, str);
       break;
     }
+    ++count;
   }
 
   return 0;
