@@ -130,6 +130,7 @@ static bool make_token(char *e) {
             tokens[nr_token++].str[0] = '+';
             break;
           case TK_DECIMAL:
+            tokens[nr_token].type = TK_DECIMAL;
             strncpy(tokens[nr_token].str, substr_start, substr_len);
             tokens[nr_token++].str[substr_len] = '\0';
             break;
