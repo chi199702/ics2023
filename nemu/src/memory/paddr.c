@@ -1,17 +1,17 @@
 /***************************************************************************************
-* Copyright (c) 2014-2022 Zihao Yu, Nanjing University
-*
-* NEMU is licensed under Mulan PSL v2.
-* You can use this software according to the terms and conditions of the Mulan PSL v2.
-* You may obtain a copy of Mulan PSL v2 at:
-*          http://license.coscl.org.cn/MulanPSL2
-*
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-* EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-* MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-*
-* See the Mulan PSL v2 for more details.
-***************************************************************************************/
+ * Copyright (c) 2014-2022 Zihao Yu, Nanjing University
+ *
+ * NEMU is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ *
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ *
+ * See the Mulan PSL v2 for more details.
+ ***************************************************************************************/
 
 #include <memory/host.h>
 #include <memory/paddr.h>
@@ -64,18 +64,18 @@ void paddr_write(paddr_t addr, int len, word_t data) {
 }
 
 void memory_print(unsigned long n, paddr_t addr) {
-	int byte_count = 4;
-	int count = 0;
-	for(; n > 0; --n) { 
-		if (count % 4 == 0) {
-			printf(ANSI_FMT(FMT_PADDR":", ANSI_FG_BLUE) "\t", addr);
-		}
-		printf(""FMT_WORD"\t", paddr_read(addr, byte_count));	
-		addr += 4;
-		++count;
-		if (count % 4 == 0) {
-			printf("\n");
-		}
-	}
-	printf("\n");
+  int byte_count = 4;
+  int count = 0;
+  for(; n > 0; --n) { 
+    if (count % 4 == 0) {
+      printf(ANSI_FMT(FMT_PADDR":", ANSI_FG_BLUE) "\t", addr);
+    }
+    printf(""FMT_WORD"\t", paddr_read(addr, byte_count));	
+    addr += 4;
+    ++count;
+    if (count % 4 == 0) {
+      printf("\n");
+    }
+  }
+  printf("\n");
 }

@@ -130,7 +130,7 @@ static int cmd_info(char* args) {
     return 0;
   }
   if (!strcmp(args, "r")) {
-    isa_reg_display();
+    //isa_reg_display();
   }else if (!strcmp(args, "w")) {
     Log("This function is not yet developed");
   }else {
