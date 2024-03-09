@@ -44,7 +44,7 @@ static struct rule {
   {"-", '-'},						// - sub
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
-  {"[0-9]+u", TK_DECIMAL},	// - decimal numberi,can't use $
+  {"[0-9]+u?", TK_DECIMAL},	// - decimal numberi,can't use $
   {"\\\n", TK_NEWLINE},   // - '\n'
 };
 
