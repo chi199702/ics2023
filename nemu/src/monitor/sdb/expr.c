@@ -203,9 +203,10 @@ static int get_priority(int operator) {
   return HIGH_PRIORITY;
 }
 
-#define BAD_EXPRESSION -1
+#define INIT -1
+
 /* find the main operator  */
-int get_main_operator(uint32_t p, uint32_t q, int* idx_main_operator, char* main_operator) {
+bool get_main_operator(uint32_t p, uint32_t q, int* idx_main_operator, char* main_operator) {
   int left_bracket = 0, right_bracket = 0;
   for (int i = p; i <= q; ++i) {
     int type = tokens[i].type;
@@ -220,7 +221,7 @@ int get_main_operator(uint32_t p, uint32_t q, int* idx_main_operator, char* main
       continue;
     }
     if (left_bracket < right_bracket) {
-      return BAD_EXPRESSION;	// bad expression
+      return false;	// bad expression
     }
     /* '+' '-' '*' '/' */
     if (left_bracket > right_bracket) {	// the operator is in parentheses
@@ -238,13 +239,19 @@ int get_main_operator(uint32_t p, uint32_t q, int* idx_main_operator, char* main
       }
     }	
   }
-  return 0;
+  if (*idx_main_operator == -1) {
+    return false;
+  }
+  return true;
 }
 
-#define INIT -1
+bool occur_error = false;
+
+#define BAD_EXPRESSION -1
 static long eval(uint32_t p, uint32_t q) {
   if (p > q) {
     Log("bad expression, p > q");
+    occur_error = true;
     return BAD_EXPRESSION;
   }else if (p == q) {
     int base = 10;
@@ -255,12 +262,14 @@ static long eval(uint32_t p, uint32_t q) {
     val = strtol(tokens[p].str, &endptr, base);
     if (errno != 0) {
       Log("error occur on strtol while parse the expression");
+      occur_error = true;
       return BAD_EXPRESSION;
     }
 
     if (endptr == tokens[p].str || *endptr != '\0') {
       if (strcmp(endptr, "u")) {
         Log("No digits were found or the string is a alphanumeric : \" %s \"", tokens[p].str);
+        occur_error = true;
         return BAD_EXPRESSION;
       }
     }
@@ -270,14 +279,16 @@ static long eval(uint32_t p, uint32_t q) {
   }else { // bad or good expression, further judgement required
     int idx_main_operator = INIT;
     char main_operator;
-    if (get_main_operator(p, q, &idx_main_operator, &main_operator) == BAD_EXPRESSION || idx_main_operator == INIT) {
+    bool flag = get_main_operator(p, q, &idx_main_operator, &main_operator);
+    if (occur_error || !flag) {
+      occur_error = true;
       return BAD_EXPRESSION;	// bad expression
     }
 
-    uint32_t left_result = (uint32_t)eval(p, idx_main_operator - 1);
-    uint32_t right_result = (uint32_t)eval(idx_main_operator + 1, q);
-    if (left_result == BAD_EXPRESSION || right_result == BAD_EXPRESSION) {
-      printf("debug point\n");
+    uint32_t left_result = eval(p, idx_main_operator - 1);
+    uint32_t right_result = eval(idx_main_operator + 1, q);
+    if (occur_error) {
+      occur_error = true;
       return BAD_EXPRESSION;
     }
 
@@ -286,7 +297,7 @@ static long eval(uint32_t p, uint32_t q) {
       case '-': return left_result - right_result;	
       case '*': return left_result * right_result;	
       case '/': return left_result / right_result;	
-      default:	return BAD_EXPRESSION;
+      default:	occur_error = true; return BAD_EXPRESSION;
     }
 
     return BAD_EXPRESSION;
@@ -301,7 +312,7 @@ word_t expr(char *e, bool *success) {
 
   /* TODO: Insert codes to evaluate the expression. */
   long compute_res = eval(0, nr_token - 1);	
-  if (compute_res == BAD_EXPRESSION || compute_res < 0) {
+  if (occur_error || compute_res < 0) {
     Log("invaild expression! please input again!");			
     *success = false;
     return 0;
