@@ -152,7 +152,7 @@ static bool make_token(char *e) {
 }
 
 /* check if all the parentheses of the expression match */
-static bool bracket_match(uint32_t p, uint32_t q) {
+static bool bracket_match(int p, int q) {
   /* collect all the parentheses in [p + 1, q - 1] of array tokens */
   char brackets[128];
   uint32_t len = 0;
@@ -187,7 +187,7 @@ static bool bracket_match(uint32_t p, uint32_t q) {
 }
 
 /* check that the expression is not wrapped in the outermost pair of parentheses  */
-static bool check_parentheses(uint32_t p, uint32_t q) {
+static bool check_parentheses(int p, int q) {
   if (tokens[p].str[0] != '(' || tokens[q].str[0] != ')') {
     return false;
   }
@@ -206,7 +206,7 @@ static int get_priority(int operator) {
 #define INIT -1
 
 /* find the main operator  */
-bool get_main_operator(uint32_t p, uint32_t q, int* idx_main_operator, char* main_operator) {
+bool get_main_operator(int p, int q, int* idx_main_operator, char* main_operator) {
   int left_bracket = 0, right_bracket = 0;
   for (int i = p; i <= q; ++i) {
     int type = tokens[i].type;
@@ -248,7 +248,7 @@ bool get_main_operator(uint32_t p, uint32_t q, int* idx_main_operator, char* mai
 bool occur_error = false;
 
 #define BAD_EXPRESSION -1
-static long eval(uint32_t p, uint32_t q) {
+static long eval(int p, int q) {
   if (p > q) {
     Log("bad expression, p > q");
     occur_error = true;
