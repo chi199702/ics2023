@@ -148,19 +148,18 @@ static int cmd_x(char* args) {
     return 0;
   }
 
-  int base_N = 10, base_EXPR = 16;
-  char* endptr_N, *endptr_EXPR;
-  long N, EXPR;
+  int base_N = 10;
+  char* endptr_N;
+  long N;
 
   errno = 0;
   N = strtol(arg_N, &endptr_N, base_N);	
-  EXPR = strtol(arg_EXPR, &endptr_EXPR, base_EXPR);
   if (errno != 0) {
     Log("error occur on strtol");
     exit(EXIT_FAILURE);
   }
 
-  if (endptr_N == arg_N || endptr_EXPR == arg_EXPR) {
+  if (endptr_N == arg_N) {
     Log("No digits were found");
     exit(EXIT_FAILURE);
   }
@@ -168,10 +167,13 @@ static int cmd_x(char* args) {
   if (*endptr_N != '\0') {
     Log("Further characters after number: \"%s\"", endptr_N);
   }
-  if (*endptr_EXPR != '\0') {
-    Log("Further characters after number: \"%s\"", endptr_EXPR);
+  bool flag;
+  word_t expression = expr(arg_EXPR, &flag);
+  if (flag == true) {
+    cpu_memory_print((unsigned long)N, expression);
+  }else{
+    Log("expression invalid: %s", arg_EXPR);
   }
-  cpu_memory_print((unsigned long)N, (paddr_t)EXPR);
   return 0;
 }
 
