@@ -39,9 +39,6 @@ int main(int argc, char* argv[]) { */
 */
 
 int main(int argc, char *argv[]) {
-  static char* dir = "/home/chiweiming/code/ics2023/nemu/tools/gen-expr/build/input";
-  FILE* f = fopen(dir, "r");
-
   /* Initialize the monitor. */
 #ifdef CONFIG_TARGET_AM
   am_init_monitor();
@@ -49,6 +46,8 @@ int main(int argc, char *argv[]) {
   init_monitor(argc, argv);
 #endif
 
+  static char* dir = "/home/chiweiming/code/ics2023/nemu/tools/gen-expr/build/input";
+  FILE* f = fopen(dir, "r");
   for (int i = 0; i < 2000; ++i) {
     char buf[65536] = {};
     if (!fgets(buf, 65535, f)) {
@@ -73,6 +72,7 @@ int main(int argc, char *argv[]) {
       printf("eval fail\ncorrect:\t%s, eval:\t%s\n", result, str);
       break;
     }
+    printf("%s %s\n",str, result);
   }
   return 0;
 }
