@@ -72,7 +72,6 @@ int main(int argc, char *argv[]) {
       printf("eval fail\ncorrect:\t%s, eval:\t%s\n", result, str);
       break;
     }
-    printf("%s %s\n",str, result);
   }
   return 0;
 }
