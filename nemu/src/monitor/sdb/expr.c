@@ -25,6 +25,9 @@ enum {
 
   /* TODO: Add more token types */
   TK_DECIMAL, TK_NEWLINE,
+  TK_HEXADECIMAL, TK_REGISTER,
+  TK_UNEQ, TK_AND,
+  TK_DEREF
 };
 
 static struct rule {
@@ -45,6 +48,10 @@ static struct rule {
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
   {"[0-9]+u?", TK_DECIMAL},	// - decimal numberi,can't use $
+  {"(0x|0X)([0-9]|[A-F]|[a-f])+", TK_HEXADECIMAL},
+  {"\\$\\w\\w?\\w?", TK_REGISTER},
+  {"!=", TK_UNEQ},
+  {"&&", TK_AND},
   {"\\\n", TK_NEWLINE},   // - '\n'
 };
 
