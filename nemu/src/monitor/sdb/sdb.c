@@ -142,8 +142,13 @@ static int cmd_info(char* args) {
 void cpu_memory_print(unsigned long n, paddr_t addr);
 static int cmd_x(char* args) {
   char* arg_N = strtok(NULL, " ");
-  char* arg_EXPR = strtok(NULL, " ");
-  if (!args || !arg_EXPR) {
+  
+  char* forward = arg_N + strlen(arg_N) + 1;  // find the first character of expression
+  while (*forward != '\0' && (*forward == '\t' || *forward == ' ')) {
+    ++forward;
+  }
+
+  if (!args || !forward) {
     Log("Usage: x N EXPR");
     return 0;
   }
@@ -168,11 +173,11 @@ static int cmd_x(char* args) {
     Log("Further characters after number: \"%s\"", endptr_N);
   }
   bool flag;
-  word_t expression = expr(arg_EXPR, &flag);
+  word_t expression = expr(forward, &flag);
   if (flag == true) {
     cpu_memory_print((unsigned long)N, expression);
   }else{
-    Log("expression invalid: %s", arg_EXPR);
+    Log("expression invalid: %s", forward);
   }
   return 0;
 }
