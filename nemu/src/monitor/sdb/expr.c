@@ -47,8 +47,8 @@ static struct rule {
   {"-", '-'},						// - sub
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
-  {"[0-9]+u?", TK_DECIMAL},	// - decimal numberi,can't use $
   {"(0x|0X)([0-9]|[A-F]|[a-f])+", TK_HEXADECIMAL},
+  {"[0-9]+u?", TK_DECIMAL},	// - decimal numberi,can't use $
   {"\\$\\w\\w?\\w?", TK_REGISTER},
   {"!=", TK_UNEQ},
   {"&&", TK_AND},
