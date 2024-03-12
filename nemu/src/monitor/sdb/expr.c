@@ -301,7 +301,7 @@ static long eval(int p, int q) {
       Log("please check the register name: %s", tokens[p].str);
       return BAD_EXPRESSION;
     }
-    if (tokens[p].type != TK_HEXADECIMAL || tokens[p].type != TK_DECIMAL) {
+    if (tokens[p].type != TK_HEXADECIMAL && tokens[p].type != TK_DECIMAL) {
       occur_error = true;
       Log("No digits were found or the string is a alphanumeric : \" %s \"", tokens[p].str);
       return BAD_EXPRESSION;
