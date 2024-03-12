@@ -27,7 +27,8 @@ enum {
   TK_DECIMAL, TK_NEWLINE,
   TK_HEXADECIMAL, TK_REGISTER,
   TK_UNEQ, TK_AND,
-  TK_DEREF
+  TK_DEREF,
+  TK_NEGATIVE,
 };
 
 static struct rule {
@@ -43,15 +44,15 @@ static struct rule {
   {"\\)", ')'},						// - right bracket
   {"\\*", '*'},					// - mul
   {"/", '/'},						// - div
-  {" +", TK_NOTYPE},    // spaces
-  {"-", '-'},						// - sub
   {"\\+", '+'},         // plus
+  {"-", '-'},						// - sub
   {"==", TK_EQ},        // equal
+  {"!=", TK_UNEQ},
+  {"&&", TK_AND},
+  {" +", TK_NOTYPE},    // spaces
   {"(0x|0X)([0-9]|[A-F]|[a-f])+", TK_HEXADECIMAL},
   {"[0-9]+u?", TK_DECIMAL},	// - decimal numberi,can't use $
   {"\\$\\w\\w?\\w?", TK_REGISTER},
-  {"!=", TK_UNEQ},
-  {"&&", TK_AND},
   {"\\\n", TK_NEWLINE},   // - '\n'
 };
 
@@ -118,6 +119,7 @@ static bool make_token(char *e) {
             tokens[nr_token++].str[0] = ')';
             break;
           case '*':
+          case TK_DEREF:
             tokens[nr_token].type = '*';
             tokens[nr_token++].str[0] = '*';
             break;
@@ -129,6 +131,7 @@ static bool make_token(char *e) {
           case TK_NEWLINE:
             break;
           case '-':
+          case TK_NEGATIVE:
             tokens[nr_token].type = '-';
             tokens[nr_token++].str[0] = '-';
             break;
@@ -138,11 +141,31 @@ static bool make_token(char *e) {
             break;
           case TK_DECIMAL:
             tokens[nr_token].type = TK_DECIMAL;
-            strncpy(tokens[nr_token].str, substr_start, substr_len);
-            tokens[nr_token++].str[substr_len] = '\0';
+            strncpy(tokens[nr_token++].str, substr_start, substr_len);
+            break;
+          case TK_HEXADECIMAL:
+            tokens[nr_token].type = TK_HEXADECIMAL;
+            strncpy(tokens[nr_token++].str, substr_start, substr_len);
+            break;
+          case TK_REGISTER:
+            tokens[nr_token].type = TK_REGISTER;
+            strncpy(tokens[nr_token++].str, substr_start, substr_len);
+            break;
+          case TK_EQ:
+            tokens[nr_token].type = TK_EQ;
+            strncpy(tokens[nr_token++].str, substr_start, substr_len);
+            break;
+          case TK_UNEQ:
+            tokens[nr_token].type = TK_UNEQ;
+            strncpy(tokens[nr_token++].str, substr_start, substr_len);
+            break;
+          case TK_AND:
+            tokens[nr_token].type = TK_AND;
+            strncpy(tokens[nr_token++].str, substr_start, substr_len);
             break;
           default:
-            Log("regular expression \"==\" wait for development"); 
+            Log("occur error"); 
+            exit(EXIT_FAILURE);
         }
 
         break;
@@ -201,19 +224,26 @@ static bool check_parentheses(int p, int q) {
   return bracket_match(p + 1, q - 1);
 }
 
-#define LOW_PRIORITY  0
-#define HIGH_PRIORITY 1
 static int get_priority(int operator) {
-  if (operator == '+' || operator == '-') {
-    return LOW_PRIORITY;
+  switch(operator) {
+    case TK_NEGATIVE: return 5;
+    case TK_DEREF: return 4;
+    case '*':
+    case '/': return 3;
+    case '+':
+    case '-': return 2;
+    case TK_EQ:
+    case TK_UNEQ: return 1;
+    case TK_AND:  return 0;
+    default: Log("error operator");
   }
-  return HIGH_PRIORITY;
+  return -1;
 }
 
 #define INIT -1
 
 /* find the main operator  */
-bool get_main_operator(int p, int q, int* idx_main_operator, char* main_operator) {
+bool get_main_operator(int p, int q, int* idx_main_operator, int* main_operator) {
   int left_bracket = 0, right_bracket = 0;
   for (int i = p; i <= q; ++i) {
     int type = tokens[i].type;
@@ -261,11 +291,29 @@ static long eval(int p, int q) {
     occur_error = true;
     return BAD_EXPRESSION;
   }else if (p == q) {
+    if (tokens[p].type == TK_REGISTER) {
+      bool success;
+      word_t regval = isa_reg_str2val(tokens[p].str, &success);
+      if (success) {
+        return regval;
+      }
+      occur_error = true;
+      Log("please check the register name: %s", tokens[p].str);
+      return BAD_EXPRESSION;
+    }
+    if (tokens[p].type != TK_HEXADECIMAL || tokens[p].type != TK_DECIMAL) {
+      occur_error = true;
+      Log("No digits were found or the string is a alphanumeric : \" %s \"", tokens[p].str);
+      return BAD_EXPRESSION;
+    }
     int base = 10;
     char* endptr;
     long val;
-
     errno = 0;
+
+    if (tokens[p].type == TK_HEXADECIMAL) {
+      base = 16;
+    }
     val = strtol(tokens[p].str, &endptr, base);
     if (errno != 0) {
       Log("error occur on strtol while parse the expression");
@@ -285,15 +333,20 @@ static long eval(int p, int q) {
     return eval(p + 1, q - 1);
   }else { // bad or good expression, further judgement required
     int idx_main_operator = INIT;
-    char main_operator;
+    int main_operator;
     bool flag = get_main_operator(p, q, &idx_main_operator, &main_operator);
     if (occur_error || !flag) {
       occur_error = true;
       return BAD_EXPRESSION;	// bad expression
     }
 
-    uint32_t left_result = eval(p, idx_main_operator - 1);
-    uint32_t right_result = eval(idx_main_operator + 1, q);
+    uint32_t left_result = 1, right_result;
+    if (tokens[idx_main_operator].type != TK_DEREF && tokens[idx_main_operator].type != TK_NEGATIVE) {
+      left_result = eval(p, idx_main_operator - 1);
+      right_result = eval(idx_main_operator + 1, q);
+    }else {
+      right_result = eval(idx_main_operator + 1, q);
+    } 
     if (occur_error) {
       occur_error = true;
       return BAD_EXPRESSION;
@@ -304,11 +357,26 @@ static long eval(int p, int q) {
       case '-': return left_result - right_result;	
       case '*': return left_result * right_result;	
       case '/': return left_result / right_result;	
+      case TK_EQ: return left_result == right_result ? 1 : 0;
+      case TK_UNEQ: return left_result != right_result ? 1 : 0;
+      case TK_AND: return left_result && right_result;
+      case TK_DEREF: 
+        word_t paddr_read(paddr_t addr, int len);
+        return paddr_read(right_result, 4); 
+      case TK_NEGATIVE: return (-1 * right_result); 
       default:	occur_error = true; return BAD_EXPRESSION;
     }
 
     return BAD_EXPRESSION;
   }
+}
+
+bool pre_signal(int i) {
+  int type = tokens[i].type;
+  if (type == TK_DECIMAL || type == TK_HEXADECIMAL || type == ')') {
+    return false;
+  }
+  return true;
 }
 
 word_t expr(char *e, bool *success) {
@@ -318,6 +386,16 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
+  for (int i = 0; i < nr_token; ++i) {  // find the operator deref '*'
+    if (tokens[i].type == '*' && (i == 0 || pre_signal(i - 1)) ) {
+      tokens[i].type = TK_DEREF;
+    } 
+  }
+  for (int i = 0; i < nr_token; ++i) {  // find the operator negative '-'
+    if (tokens[i].type == '-' && (i == 0 || pre_signal(i - 1)) ) {
+      tokens[i].type = TK_NEGATIVE;
+    } 
+  }
   long compute_res = eval(0, nr_token - 1);	
   if (occur_error || compute_res < 0) {
     Log("invaild expression! please input again!");			
