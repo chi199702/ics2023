@@ -24,12 +24,20 @@ const char *regs[] = {
 };
 
 void isa_reg_display() {
-	unsigned int registers = sizeof(cpu.gpr) / sizeof(word_t);
-	for (int i = 0; i < registers; ++i) {
+	unsigned int reg_num = sizeof(cpu.gpr) / sizeof(word_t);
+	for (int i = 0; i < reg_num; ++i) {
 		printf("%s\t\t\t%x\t\t\t%d\n", regs[i], cpu.gpr[0], cpu.gpr[0]);
 	}
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
+	unsigned int reg_num = sizeof(cpu.gpr) / sizeof(word_t);
+	for (int i = 0; i < reg_num; ++i) {
+    if (!strcmp(regs[i], s)) {
+      *success = true;
+      return cpu.gpr[i];
+    }
+	}
+  success = false;
   return 0;
 }
