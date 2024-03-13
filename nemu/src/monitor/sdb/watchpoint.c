@@ -40,4 +40,27 @@ void init_wp_pool() {
 }
 
 /* TODO: Implement the functionality of watchpoint */
+WP* new_wp() {
+  WP* ptr = NULL;
+  if (free_) {
+    ptr = free_;
+    free_ = free_ -> next; 
+    return ptr;
+  }
+  panic("no idle watchpoint to malloc");
+}
 
+void free_wp(WP* wp) {
+  if (!free_) {
+    free_ = wp;
+    (*wp).next = NULL;
+    return;
+  }
+
+  WP* cursor = free_;
+  while (cursor -> next != NULL) {
+    cursor = cursor -> next;
+  }
+  cursor -> next = wp;
+  wp -> next = NULL;
+}
