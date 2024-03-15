@@ -181,14 +181,10 @@ static int cmd_w(char* args) {
   return 0;
 }
 
-void del_wp(int, bool*);
+void del_wp(int);
 static int cmd_d(char* args) {
   long NO = strtol_(args, 10);
-  bool success;
-  del_wp(NO, &success);
-  if (!success) {
-    return -1;
-  }
+  del_wp(NO);
   return 0;
 }
 

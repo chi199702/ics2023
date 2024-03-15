@@ -105,15 +105,13 @@ void add_wp(char* exp, bool* success) {
   *success = true;
 }
 
-void del_wp(int NO, bool* success) {
+void del_wp(int NO) {
   if (NO < 0 || !head) {
-    *success = false;
-    Log("no watch points or the NO of watch point incorrect");
+    printf("no watch points or the NO of watch point incorrect");
     return;
   }
   WP* cursor = head;
   if (cursor -> NO == NO) {
-    *success = true;
     head = head -> next;
     free_wp(cursor);
     return;
@@ -123,10 +121,8 @@ void del_wp(int NO, bool* success) {
       WP* tmp = cursor -> next;
       cursor -> next = cursor -> next -> next;      
       free_wp(tmp);
-      *success = true;
       return;
     }
   }
   printf("No breakpoint number %d\n.", NO);
-  *success = false;
 }
