@@ -78,6 +78,7 @@ static void free_wp(WP* wp) {
   }
   cursor -> next = wp;
   wp -> next = NULL;
+  free(wp -> exp);
 }
 
 static int wp_count = 0;
@@ -88,7 +89,8 @@ void add_wp(char* exp, bool* success) {
     return;
   }
   new_wp_ -> NO = ++wp_count;
-  new_wp_ -> exp = exp;
+  new_wp_ -> exp = (char*)malloc(strlen(exp) + 1);
+  strcpy(new_wp_ -> exp, exp);
   
   if (!head) {
     head = new_wp_;
