@@ -127,5 +127,6 @@ void del_wp(int NO, bool* success) {
       return;
     }
   }
+  printf("No breakpoint number %d\n.", NO);
   *success = false;
 }
