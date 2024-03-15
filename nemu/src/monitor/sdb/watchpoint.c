@@ -40,6 +40,18 @@ void init_wp_pool() {
 }
 
 /* TODO: Implement the functionality of watchpoint */
+void info_w() {
+  if (!head) {
+    printf("No watchpoints\n");
+    return;
+  }
+  printf("Num\tDisp\tEnb\tAddress\t\t\tWhat\n");
+  WP* cursor = head;
+  while (cursor) {
+    printf("%d\t-\t-\t-\t\t\t%s\n", cursor -> NO, cursor -> exp);
+    cursor = cursor -> next;
+  }
+}
 static WP* new_wp(bool* success) {
   WP* ptr = NULL;
   if (free_) {

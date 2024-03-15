@@ -130,6 +130,7 @@ static int cmd_si(char *args) {
   return 0;
 }
 
+void info_w();
 static int cmd_info(char* args) {
   if (!args) {
     Log("Usage: info r/w");
@@ -138,7 +139,7 @@ static int cmd_info(char* args) {
   if (!strcmp(args, "r")) {
     isa_reg_display();
   }else if (!strcmp(args, "w")) {
-    Log("This function is not yet developed");
+    info_w();
   }else {
     Log("Usage: info r/w");
   }
