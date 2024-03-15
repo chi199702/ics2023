@@ -55,6 +55,8 @@ static int cmd_help(char *args);
 static int cmd_si(char* args);
 static int cmd_info(char* args);
 static int cmd_x(char* args);
+static int cmd_w(char* args);
+static int cmd_d(char* args);
 
 static struct {
   const char *name;
@@ -69,6 +71,8 @@ static struct {
   { "si", "Execute one of the program's instructions", cmd_si },
   { "info", "Display registers and watch points", cmd_info },
   { "x", "Print memory", cmd_x },
+  { "w", "Watch point", cmd_w },
+  { "d", "Delete watch point", cmd_d },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -96,29 +100,31 @@ static int cmd_help(char *args) {
   return 0;
 }
 
+static long strtol_(char* args, int base) {
+  char* endptr;
+  errno = 0;
+  long val = strtol(args, &endptr, base);	
+  if (errno != 0) {
+    Log("error occur on strtol");
+    exit(EXIT_FAILURE);
+  }
+
+  if (endptr == args) {
+    Log("No digits were found");
+    exit(EXIT_FAILURE);
+  }
+
+  if (*endptr != '\0') {
+    Log("Further characters after number: \"%s\"", endptr);
+  }
+  return val;
+}
+
 static int cmd_si(char *args) {
   if (!args) {	// no argument given
     cpu_exec(1);
   }else {
-    int base = 10;
-    char* endptr;
-    long val;
-
-    errno = 0;
-    val = strtol(args, &endptr, base);	
-    if (errno != 0) {
-      Log("error occur on strtol");
-      exit(EXIT_FAILURE);
-    }
-
-    if (endptr == args) {
-      Log("No digits were found");
-      exit(EXIT_FAILURE);
-    }
-
-    if (*endptr != '\0') {
-      Log("Further characters after number: \"%s\"", endptr);
-    }
+    long val = strtol_(args, 10);
     cpu_exec(val);
   }
   return 0;
@@ -153,31 +159,34 @@ static int cmd_x(char* args) {
     return 0;
   }
 
-  int base_N = 10;
-  char* endptr_N;
-  long N;
-
-  errno = 0;
-  N = strtol(arg_N, &endptr_N, base_N);	
-  if (errno != 0) {
-    Log("error occur on strtol");
-    exit(EXIT_FAILURE);
-  }
-
-  if (endptr_N == arg_N) {
-    Log("No digits were found");
-    exit(EXIT_FAILURE);
-  }
-
-  if (*endptr_N != '\0') {
-    Log("Further characters after number: \"%s\"", endptr_N);
-  }
+  long val = strtol_(arg_N, 10);
   bool flag;
   word_t expression = expr(forward, &flag);
   if (flag == true) {
-    cpu_memory_print((unsigned long)N, expression);
+    cpu_memory_print(val, expression);
   }else{
     Log("expression invalid: %s", forward);
+  }
+  return 0;
+}
+
+void add_wp(const char*, bool*);
+static int cmd_w(char* args) {
+  bool success;
+  add_wp(args, &success);
+  if (!success) {
+    return -1;
+  }
+  return 0;
+}
+
+void del_wp(int, bool*);
+static int cmd_d(char* args) {
+  long NO = strtol_(args, 10);
+  bool success;
+  del_wp(NO, &success);
+  if (!success) {
+    return -1;
   }
   return 0;
 }

@@ -22,7 +22,7 @@ typedef struct watchpoint {
   struct watchpoint *next;
 
   /* TODO: Add more members if necessary */
-
+  char* exp;  // expression
 } WP;
 
 static WP wp_pool[NR_WP] = {};
@@ -40,20 +40,23 @@ void init_wp_pool() {
 }
 
 /* TODO: Implement the functionality of watchpoint */
-WP* new_wp() {
+static WP* new_wp(bool* success) {
   WP* ptr = NULL;
   if (free_) {
     ptr = free_;
     free_ = free_ -> next; 
+    ptr -> next = NULL;
+    *success = true;
     return ptr;
   }
-  panic("no idle watchpoint to malloc");
+  *success = false;
+  return ptr;
 }
 
-void free_wp(WP* wp) {
+static void free_wp(WP* wp) {
   if (!free_) {
     free_ = wp;
-    (*wp).next = NULL;
+    wp -> next = NULL;
     return;
   }
 
@@ -63,4 +66,52 @@ void free_wp(WP* wp) {
   }
   cursor -> next = wp;
   wp -> next = NULL;
+}
+
+static int wp_count = 0;
+void add_wp(char* exp, bool* success) {
+  WP* new_wp_ = new_wp(success);
+  if (*success == false) {
+    Log("the number of watch points has exceeded the limit");
+    return;
+  }
+  new_wp_ -> NO = ++wp_count;
+  new_wp_ -> exp = exp;
+  
+  if (!head) {
+    head = new_wp_;
+    *success = true;
+    return;
+  }
+  WP* cursor = head;
+  while (cursor -> next != NULL) {
+    cursor = cursor -> next;
+  }
+  cursor -> next = new_wp_;
+  *success = true;
+}
+
+void del_wp(int NO, bool* success) {
+  if (NO < 0 || !head) {
+    *success = false;
+    Log("no watch points or the NO of watch point incorrect");
+    return;
+  }
+  WP* cursor = head;
+  if (cursor -> NO == NO) {
+    *success = true;
+    head = head -> next;
+    free_wp(cursor);
+    return;
+  }
+  for (; cursor -> next; cursor = cursor -> next) {
+    if (cursor -> next -> NO == NO) {
+      WP* tmp = cursor -> next;
+      cursor -> next = cursor -> next -> next;      
+      free_wp(tmp);
+      *success = true;
+      return;
+    }
+  }
+  *success = false;
 }
