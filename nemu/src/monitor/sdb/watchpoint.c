@@ -23,6 +23,7 @@ typedef struct watchpoint {
 
   /* TODO: Add more members if necessary */
   char* exp;  // expression
+  uint32_t value;
 } WP;
 
 static WP wp_pool[NR_WP] = {};
@@ -66,9 +67,11 @@ static WP* new_wp(bool* success) {
 }
 
 static void free_wp(WP* wp) {
+  wp -> value = 0;
+  wp -> next = NULL;
+  wp -> exp = NULL;
   if (!free_) {
     free_ = wp;
-    wp -> next = NULL;
     return;
   }
 
@@ -77,10 +80,11 @@ static void free_wp(WP* wp) {
     cursor = cursor -> next;
   }
   cursor -> next = wp;
-  wp -> next = NULL;
   free(wp -> exp);
 }
 
+
+void del_wp(int NO);
 static int wp_count = 0;
 void add_wp(char* exp, bool* success) {
   WP* new_wp_ = new_wp(success);
@@ -91,6 +95,13 @@ void add_wp(char* exp, bool* success) {
   new_wp_ -> NO = ++wp_count;
   new_wp_ -> exp = (char*)malloc(strlen(exp) + 1);
   strcpy(new_wp_ -> exp, exp);
+  bool success_;
+  new_wp_ -> value = expr(exp, &success_);
+  if (!success_) {
+    del_wp(new_wp_ -> NO);
+    success = false;
+    return;
+  }
   
   if (!head) {
     head = new_wp_;
@@ -107,7 +118,7 @@ void add_wp(char* exp, bool* success) {
 
 void del_wp(int NO) {
   if (NO < 0 || !head) {
-    printf("no watch points or the NO of watch point incorrect");
+    printf("no watch points or the NO of watch point incorrect\n");
     return;
   }
   WP* cursor = head;
@@ -125,4 +136,17 @@ void del_wp(int NO) {
     }
   }
   printf("No breakpoint number %d\n.", NO);
+}
+
+void travel_wp() {
+  bool success;
+  for (WP* cursor = head; cursor; cursor = cursor -> next) {
+    uint32_t new_value = expr(cursor -> exp, &success);
+    if (success && cursor -> value != new_value){
+      printf("watchpoint %d: %s\n\n", cursor -> NO, cursor -> exp);
+      printf("Old value = %d\n", cursor -> value);
+      printf("New value = %d\n", new_value);
+      cursor -> value = new_value;
+    }
+  }
 }
